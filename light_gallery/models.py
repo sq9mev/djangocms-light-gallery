@@ -3,6 +3,8 @@ from django.utils.translation import ugettext_lazy as _
 from cms.models.pluginmodel import CMSPlugin
 from filer.fields.folder import FilerFolderField
 from filer.models.imagemodels import Image
+from djangocms_link.models import AbstractLink
+from filer.fields.image import FilerImageField
 import uuid
 
 MODES = [['lg-slide', 'lg-slide'], ['lg-fade', 'lg-fade'], ['lg-zoom-in', 'lg-zoom-in'], ['lg-zoom-in-big', 'lg-zoom-in-big'], ['lg-zoom-out', 'lg-zoom-out'], ['lg-zoom-out-big', 'lg-zoom-out-big'], ['lg-zoom-out-in', 'lg-zoom-out-in'], ['lg-zoom-in-out', 'lg-zoom-in-out'], ['lg-soft-zoom', 'lg-soft-zoom'], ['lg-scale-up', 'lg-scale-up'], ['lg-slide-circular', 'lg-slide-circular'], ['lg-slide-circular-vertical', 'lg-slide-circular-vertical'], ['lg-slide-vertical', 'lg-slide-vertical'], ['lg-slide-vertical-growth', 'lg-slide-vertical-growth'], ['lg-slide-skew-only', 'lg-slide-skew-only'], ['lg-slide-skew-only-rev', 'lg-slide-skew-only-rev'], ['lg-slide-skew-only-y', 'lg-slide-skew-only-y'], ['lg-slide-skew-only-y-rev', 'lg-slide-skew-only-y-rev'], ['lg-slide-skew', 'lg-slide-skew'], ['lg-slide-skew-rev', 'lg-slide-skew-rev'], ['lg-slide-skew-cross', 'lg-slide-skew-cross'], ['lg-slide-skew-cross-rev', 'lg-slide-skew-cross-rev'], ['lg-slide-skew-ver', 'lg-slide-skew-ver'], ['lg-slide-skew-ver-rev', 'lg-slide-skew-ver-rev'], ['lg-slide-skew-ver-cross', 'lg-slide-skew-ver-cross'], ['lg-slide-skew-ver-cross-rev', 'lg-slide-skew-ver-cross-rev'], ['lg-lollipop', 'lg-lollipop'], ['lg-lollipop-rev', 'lg-lollipop-rev'], ['lg-rotate', 'lg-rotate'], ['lg-rotate-rev', 'lg-rotate-rev'], ['lg-tube', 'lg-tube']]
@@ -12,6 +14,8 @@ class LightGallery(CMSPlugin):
     folder = FilerFolderField(
         verbose_name=_('Folder'),
         on_delete=models.CASCADE,
+        blank=True,
+        null=True
     )
     pageThumbWidth = models.CharField(_("Page Thumb Width"), max_length=255, default="150", help_text=_("Width of thumbnail on page"))
     pageThumbHeight = models.CharField(_("Page Thumb Height"), max_length=255, default="150", help_text=_("Height of thumbnail on page"))
@@ -84,11 +88,35 @@ class LightGallery(CMSPlugin):
     pinterestDropdownText = models.CharField(_("Pinterest dropdown text"), default="Pinterest", max_length=255)
 
     def get_folder_images(self):
-        images = self.folder.files.instance_of(Image)
-        return images.filter(is_public=True)
+        if self.folder:
+            images = self.folder.files.instance_of(Image)
+            return images.filter(is_public=True).order_by('name',)
 
     def generate_id(self):
         return str(uuid.uuid4().fields[-1])[:7]
 
     def parse_page_thumb_width_height(self):
         return "%sx%s" % (self.pageThumbWidth, self.pageThumbHeight)
+
+    def copy_relations(self, oldinstance):
+        for photo in oldinstance.photo_set.all():
+            # instance.pk = None; instance.pk.save() is the slightly odd but
+            # standard Django way of copying a saved model instance
+            photo.pk = None
+            photo.plugin = self
+            photo.save()
+
+
+class LightGalleryImage(CMSPlugin):
+    image = FilerImageField(
+        verbose_name=_('Gallery image'),
+        blank=False,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name='images',
+    )
+
+    @property
+    def gallery(self):
+        gallery, _ = self.parent.get_plugin_instance()
+        return gallery

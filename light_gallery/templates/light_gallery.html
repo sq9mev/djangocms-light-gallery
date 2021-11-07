@@ -119,4 +119,7 @@
     <img src="{% thumbnail image.file pageThumbWidthHeight upscale crop %}"></img>
   </a>
   {% endfor %}
+  {% for plugin in instance.child_plugin_instances %}
+    {% render_plugin plugin %}
+  {% endfor %}
 </div>

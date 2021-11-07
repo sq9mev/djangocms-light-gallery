@@ -1,0 +1,7 @@
+{% load thumbnail %}
+
+  <a href="{{MEDIA_URL}}{{ instance.image.file }}">
+    <img class="img-responsive" width="150px" height="150px"
+        src="{% thumbnail instance.image.file instance.gallery.parse_page_thumb_width_height upscale crop %}"></img>
+  </a>
+

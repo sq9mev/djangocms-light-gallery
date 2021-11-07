@@ -2,7 +2,7 @@ from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from django.utils.translation import ugettext_lazy as _
 
-from .models import LightGallery
+from .models import LightGallery, LightGalleryImage
 
 
 class LightGallery(CMSPluginBase):
@@ -10,6 +10,8 @@ class LightGallery(CMSPluginBase):
     name = _("Light Gallery")
     render_template = "light_gallery.html"
     cache = True
+    allow_children = True
+    child_classes = ['LightGalleryImage',]
 
     fieldsets = (
         (None, {
@@ -117,6 +119,7 @@ class LightGallery(CMSPluginBase):
 
     def render(self, context, instance, placeholder):
         context.update({
+            'instance': instance,
             'images': instance.get_folder_images(),
             'pageThumbWidthHeight': instance.parse_page_thumb_width_height(),
             'mode': instance.mode,
@@ -184,3 +187,11 @@ class LightGallery(CMSPluginBase):
         return context
 
 plugin_pool.register_plugin(LightGallery)
+
+
+class LightGalleryImage(CMSPluginBase):
+    model = LightGalleryImage
+    parent_classes = ['LightGallery']
+    render_template = "light_gallery_image.html"
+
+plugin_pool.register_plugin(LightGalleryImage)
