@@ -98,14 +98,6 @@ class LightGallery(CMSPlugin):
     def parse_page_thumb_width_height(self):
         return "%sx%s" % (self.pageThumbWidth, self.pageThumbHeight)
 
-    def copy_relations(self, oldinstance):
-        for photo in oldinstance.photo_set.all():
-            # instance.pk = None; instance.pk.save() is the slightly odd but
-            # standard Django way of copying a saved model instance
-            photo.pk = None
-            photo.plugin = self
-            photo.save()
-
 
 class LightGalleryImage(CMSPlugin):
     image = FilerImageField(
