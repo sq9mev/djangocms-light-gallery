@@ -18,7 +18,8 @@ class LightGallery(CMSPluginBase):
             'fields': [
                 'folder',
                 ('pageThumbWidth',
-                'pageThumbHeight',),
+                'pageThumbHeight',
+                'imageSize',),
             ]
         }),
         (_('Toolbar Settings'), {
@@ -120,6 +121,7 @@ class LightGallery(CMSPluginBase):
     def render(self, context, instance, placeholder):
         context.update({
             'instance': instance,
+            'imageSize': instance.imageSize,
             'images': instance.get_folder_images(),
             'pageThumbWidthHeight': instance.parse_page_thumb_width_height(),
             'mode': instance.mode,

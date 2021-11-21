@@ -113,9 +113,15 @@
 </script>
 {% endaddtoblock %}
 
+
 <div id="light-gallery-{{ id }}" class="light-gallery-plugin">
   {% for image in images %}
-  <a href="{{MEDIA_URL}}{{ image.file }}">
+  {% if imageSize %}
+    {% thumbnail image imageSize.as_dict.size crop=imageSize.crop upscale=imageSize.upscale subject_location=imageSize.subject_location as thumb %}
+    <a href="{{ thumb.url }}">
+  {% else %}
+    <a href="{{ MEDIA_URL }}{{ image.file }}">
+  {% endif %}
     <img src="{% thumbnail image.file pageThumbWidthHeight upscale crop %}"></img>
   </a>
   {% endfor %}

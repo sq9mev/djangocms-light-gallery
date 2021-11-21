@@ -1,11 +1,14 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 from cms.models.pluginmodel import CMSPlugin
 from filer.fields.folder import FilerFolderField
 from filer.models.imagemodels import Image
+from filer.models import ThumbnailOption
 from djangocms_link.models import AbstractLink
 from filer.fields.image import FilerImageField
 import uuid
+
 
 MODES = [['lg-slide', 'lg-slide'], ['lg-fade', 'lg-fade'], ['lg-zoom-in', 'lg-zoom-in'], ['lg-zoom-in-big', 'lg-zoom-in-big'], ['lg-zoom-out', 'lg-zoom-out'], ['lg-zoom-out-big', 'lg-zoom-out-big'], ['lg-zoom-out-in', 'lg-zoom-out-in'], ['lg-zoom-in-out', 'lg-zoom-in-out'], ['lg-soft-zoom', 'lg-soft-zoom'], ['lg-scale-up', 'lg-scale-up'], ['lg-slide-circular', 'lg-slide-circular'], ['lg-slide-circular-vertical', 'lg-slide-circular-vertical'], ['lg-slide-vertical', 'lg-slide-vertical'], ['lg-slide-vertical-growth', 'lg-slide-vertical-growth'], ['lg-slide-skew-only', 'lg-slide-skew-only'], ['lg-slide-skew-only-rev', 'lg-slide-skew-only-rev'], ['lg-slide-skew-only-y', 'lg-slide-skew-only-y'], ['lg-slide-skew-only-y-rev', 'lg-slide-skew-only-y-rev'], ['lg-slide-skew', 'lg-slide-skew'], ['lg-slide-skew-rev', 'lg-slide-skew-rev'], ['lg-slide-skew-cross', 'lg-slide-skew-cross'], ['lg-slide-skew-cross-rev', 'lg-slide-skew-cross-rev'], ['lg-slide-skew-ver', 'lg-slide-skew-ver'], ['lg-slide-skew-ver-rev', 'lg-slide-skew-ver-rev'], ['lg-slide-skew-ver-cross', 'lg-slide-skew-ver-cross'], ['lg-slide-skew-ver-cross-rev', 'lg-slide-skew-ver-cross-rev'], ['lg-lollipop', 'lg-lollipop'], ['lg-lollipop-rev', 'lg-lollipop-rev'], ['lg-rotate', 'lg-rotate'], ['lg-rotate-rev', 'lg-rotate-rev'], ['lg-tube', 'lg-tube']]
 CURRENT_PAGER_POSITIONS = [['left', 'Left'], ['middle', 'Middle'], ['right', 'Right']]
@@ -16,6 +19,15 @@ class LightGallery(CMSPlugin):
         on_delete=models.CASCADE,
         blank=True,
         null=True
+    )
+    imageSize = models.ForeignKey(
+        ThumbnailOption,
+        verbose_name=_("Scaled image size"),
+        related_name="lightgallery_thumbnail",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        default=getattr(settings, 'LG_DEFAULT_IMAGESIZE', None)
     )
     pageThumbWidth = models.CharField(_("Page Thumb Width"), max_length=255, default="150", help_text=_("Width of thumbnail on page"))
     pageThumbHeight = models.CharField(_("Page Thumb Height"), max_length=255, default="150", help_text=_("Height of thumbnail on page"))

@@ -1,6 +1,11 @@
 {% load thumbnail %}
+  {% if imageSize %}
+    {% thumbnail instance.image instance.gallery.imageSize.as_dict.size crop=instance.gallery.imageSize.crop upscale=instance.gallery.imageSize.upscale subject_location=instance.gallery.imageSize.subject_location as thumb %}
+    <a href="{{ thumb.url }}">
+  {% else %}
+    <a href="{{ MEDIA_URL }}{{ instance.image.file }}">
+  {% endif %}
 
-  <a href="{{MEDIA_URL}}{{ instance.image.file }}">
     <img class="img-responsive" width="150px" height="150px"
         src="{% thumbnail instance.image.file instance.gallery.parse_page_thumb_width_height upscale crop %}"></img>
   </a>
