@@ -1,6 +1,10 @@
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
-from django.utils.translation import ugettext_lazy as _
+import django
+if django.VERSION[0] < 4:
+    from django.utils.translation import ugettext_lazy as _
+else:
+    from django.utils.translation import gettext_lazy as _
 
 from .models import LightGallery, LightGalleryImage
 
@@ -19,7 +23,9 @@ class LightGallery(CMSPluginBase):
                 'folder',
                 ('pageThumbWidth',
                 'pageThumbHeight',
-                'imageSize',),
+                'imageSize',
+                'pageThumbMarginVertical',
+                'pageThumbMarginHorizontal',),
             ]
         }),
         (_('Toolbar Settings'), {
@@ -124,6 +130,8 @@ class LightGallery(CMSPluginBase):
             'imageSize': instance.imageSize,
             'images': instance.get_folder_images(),
             'pageThumbWidthHeight': instance.parse_page_thumb_width_height(),
+            'pageThumbMarginHorizontal': instance.pageThumbMarginHorizontal,
+            'pageThumbMarginVertical': instance.pageThumbMarginVertical,
             'mode': instance.mode,
             'cssEasing': instance.cssEasing,
             'easing': instance.easing,
@@ -146,7 +154,6 @@ class LightGallery(CMSPluginBase):
             'preload': instance.preload,
             'showAfterLoad': instance.showAfterLoad,
             'nextHtml': instance.nextHtml,
-            'nextHtml': instance.nextHtml,
             'index': instance.index,
             'iframeMaxWidth': instance.iframeMaxWidth,
             'download': instance.download,
@@ -166,7 +173,6 @@ class LightGallery(CMSPluginBase):
             'pullCaptionUp': instance.pullCaptionUp,
             'enableThumbDrag': instance.enableThumbDrag,
             'enableThumbSwipe': instance.enableThumbSwipe,
-            'swipeThreshold': instance.swipeThreshold,
             'id': instance.generate_id(),
             'fullscreen': instance.fullscreen,
             'zoom': instance.zoom,
@@ -185,7 +191,7 @@ class LightGallery(CMSPluginBase):
             'googlePlusDropdownText': instance.googlePlusDropdownText,
             'pinterest': instance.pinterest,
             'pinterestDropdownText': instance.pinterestDropdownText,
-        });
+        })
         return context
 
 plugin_pool.register_plugin(LightGallery)

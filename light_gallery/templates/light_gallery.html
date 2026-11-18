@@ -8,6 +8,13 @@
 {% addtoblock "css" %}
 <link type="text/css" rel="stylesheet" href="{% static 'css/lg-fb-comment-box.min.css'%}" />
 {% endaddtoblock %}
+{% addtoblock "css" %}
+    <style>
+        #light-gallery-{{ id }} a img {
+            margin: {{ pageThumbMarginVertical }} {{ pageThumbMarginHorizontal }};
+        }
+    </style>
+{% endaddtoblock %}
 
 {% addtoblock "js" %}
 <script defer type="text/javascript" src="{% static 'js/lightgallery.min.js' %}"></script>
@@ -120,7 +127,7 @@
     {% thumbnail image imageSize.as_dict.size crop=imageSize.crop upscale=imageSize.upscale subject_location=imageSize.subject_location as thumb %}
     <a href="{{ thumb.url }}">
   {% else %}
-    <a href="{{ MEDIA_URL }}{{ image.file }}">
+    <a href="{{ image.file.url }}">
   {% endif %}
     <img src="{% thumbnail image.file pageThumbWidthHeight upscale crop %}"></img>
   </a>
